@@ -1,133 +1,112 @@
 /**
- * Microsite Application Logic
+ * Microsite Application Logic — Linktree Minimalis
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    Auth.init();
+    initSession();
     initProfile();
-    initSocials();
-    initCategories();
+    initAuthButton();
     initLinks();
-    initThemes();
-    initMusicPlayer();
-    initSearch();
+    initLinkEditor();
     initModals();
-    initContactForm();
-    initShareFeatures();
 });
 
-let currentCategory = 'all';
-let searchQuery = '';
+let isAdmin = false;
+
+const LINKS_STORAGE_KEY = 'microsite_custom_links';
 
 /**
- * 1. Render Profile Information
+ * 0. Session & Data Links (localStorage)
+ */
+function getSessionUser() {
+    try {
+        return JSON.parse(localStorage.getItem('microsite_session'));
+    } catch (err) {
+        return null;
+    }
+}
+
+function initSession() {
+    const user = getSessionUser();
+    isAdmin = !!user;
+
+    if (isAdmin && user) {
+        setTimeout(() => showToast(`Halo, ${user.name}! Mode admin aktif.`), 500);
+    }
+
+    // Muat custom links dari localStorage
+    let customLinks = [];
+    try {
+        customLinks = JSON.parse(localStorage.getItem(LINKS_STORAGE_KEY)) || [];
+    } catch (err) {
+        customLinks = [];
+    }
+
+    if (customLinks.length > 0) {
+        siteData.links = customLinks;
+    }
+
+    // Tampilkan admin bar jika login
+    const adminBar = document.getElementById('admin-bar');
+    if (adminBar && isAdmin) {
+        adminBar.style.display = 'flex';
+    }
+}
+
+function persistLinks() {
+    localStorage.setItem(LINKS_STORAGE_KEY, JSON.stringify(siteData.links));
+}
+
+/**
+ * 1. Profil
  */
 function initProfile() {
     const { profile } = siteData;
     if (!profile) return;
 
-    // Avatar
     const avatarImg = document.getElementById('profile-avatar');
     if (avatarImg) {
         avatarImg.src = profile.avatar;
         avatarImg.onerror = () => {
-            // Fallback avatar generator
-            avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=6366f1&color=fff&size=200&bold=true`;
+            avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=aac8c0&color=fff&size=200&bold=true`;
         };
     }
 
-    // Name & Handle
-    document.getElementById('profile-name').textContent = profile.name;
     document.getElementById('profile-handle').textContent = profile.handle;
-    document.getElementById('footer-name').textContent = profile.name;
-
-    // Status Pill
-    const statusText = document.getElementById('status-text');
-    const onlineStatus = document.getElementById('online-status');
-    if (profile.status) {
-        statusText.textContent = profile.status.text;
-        if (!profile.status.available && onlineStatus) {
-            onlineStatus.style.display = 'none';
-        }
-    }
-
-    // Bio & Location
     document.getElementById('profile-bio').textContent = profile.bio;
-    document.getElementById('profile-location').textContent = profile.location;
 
-    // Stats
-    if (profile.stats) {
-        document.getElementById('stat-views').textContent = profile.stats.views || '10K+';
-        document.getElementById('stat-links').textContent = siteData.links ? siteData.links.length : '0';
-        document.getElementById('stat-followers').textContent = profile.stats.followers || '5K+';
-    }
-
-    // Year
     const yearEl = document.getElementById('current-year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
 }
 
 /**
- * 2. Render Social Icons
+ * 2. Tombol titik-tiga kanan atas (login/logout)
  */
-function initSocials() {
-    const socialBar = document.getElementById('social-bar');
-    if (!socialBar || !siteData.socials) return;
+function initAuthButton() {
+    const btn = document.getElementById('btn-auth');
+    const icon = document.getElementById('btn-auth-icon');
+    if (!btn) return;
 
-    socialBar.innerHTML = '';
-    siteData.socials.forEach(social => {
-        const a = document.createElement('a');
-        a.href = social.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'social-icon-btn';
-        a.title = social.name;
-        a.setAttribute('aria-label', social.name);
-        a.innerHTML = `<i class="${social.icon}"></i>`;
-        
-        // Custom hover color effect
-        a.addEventListener('mouseenter', () => {
-            a.style.color = social.color;
-            a.style.borderColor = social.color;
-            a.style.boxShadow = `0 0 15px ${social.color}40`;
-        });
-        a.addEventListener('mouseleave', () => {
-            a.style.color = '';
-            a.style.borderColor = '';
-            a.style.boxShadow = '';
-        });
-
-        socialBar.appendChild(a);
-    });
-}
-
-/**
- * 3. Render Category Filter Chips
- */
-function initCategories() {
-    const chipContainer = document.getElementById('category-chips');
-    if (!chipContainer || !siteData.categories) return;
-
-    chipContainer.innerHTML = '';
-    siteData.categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = `chip-btn ${cat.id === currentCategory ? 'active' : ''}`;
-        btn.setAttribute('data-category', cat.id);
-        btn.innerHTML = `<i class="${cat.icon}"></i> <span>${cat.label}</span>`;
-        
+    if (isAdmin) {
+        btn.title = 'Keluar';
+        if (icon) icon.className = 'fas fa-right-from-bracket';
         btn.addEventListener('click', () => {
-            currentCategory = cat.id;
-            // Update active styling
-            document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderLinks();
+            if (!confirm('Keluar dari mode admin?')) return;
+            Auth.logout();
+            showToast('Anda telah keluar.');
+            setTimeout(() => window.location.reload(), 700);
         });
-
-        chipContainer.appendChild(btn);
-    });
+    } else {
+        btn.title = 'Masuk Admin';
+        btn.addEventListener('click', () => {
+            window.location.href = 'login.html';
+        });
+    }
 }
 
 /**
- * 4. Render Link Cards
+ * 3. Render daftar link (pill style)
  */
 function initLinks() {
     renderLinks();
@@ -139,358 +118,248 @@ function renderLinks() {
 
     container.innerHTML = '';
 
-    // Filter logic
-    const filtered = siteData.links.filter(link => {
-        const matchCategory = currentCategory === 'all' 
-            || link.category === currentCategory 
-            || (currentCategory === 'featured' && link.highlighted);
-            
-        const matchSearch = !searchQuery 
-            || link.title.toLowerCase().includes(searchQuery.toLowerCase())
-            || (link.subtitle && link.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Tombol tambah link untuk admin
+    if (isAdmin) {
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-add-link';
+        addBtn.innerHTML = `<i class="fas fa-plus"></i> Tambah Link Baru`;
+        addBtn.addEventListener('click', () => openLinkEditor());
+        container.appendChild(addBtn);
+    }
 
-        return matchCategory && matchSearch;
-    });
-
-    if (filtered.length === 0) {
-        container.innerHTML = `
-            <div class="empty-links">
-                <i class="fas fa-search"></i>
-                <p>Tidak ada tautan yang sesuai dengan pencarian atau kategori ini.</p>
-            </div>
-        `;
+    if (siteData.links.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-links';
+        empty.innerHTML = `<i class="fas fa-link"></i> Belum ada link. Yuk tambahkan link pertama Anda!`;
+        container.appendChild(empty);
         return;
     }
 
-    filtered.forEach(link => {
-        const card = document.createElement('div');
-        card.className = `link-card ${link.highlighted ? 'highlighted' : ''}`;
-        
-        // Badge HTML if exists
-        let badgeHtml = '';
-        if (link.badge) {
-            const badgeTypeClass = link.badgeType || 'featured';
-            badgeHtml = `<span class="badge-tag ${badgeTypeClass}">${link.badge}</span>`;
-        }
+    siteData.links.forEach(link => {
+        const pill = document.createElement('div');
+        pill.className = `link-pill ${link.highlighted ? 'highlighted' : ''} ${isAdmin ? 'admin-actions' : ''}`;
 
-        card.innerHTML = `
-            <div class="link-icon-box">
-                <i class="${link.icon || 'fas fa-link'}"></i>
-            </div>
-            <div class="link-content">
-                <div class="link-title-row">
-                    <span class="link-title">${link.title}</span>
-                    ${badgeHtml}
-                </div>
-                ${link.subtitle ? `<div class="link-subtitle">${link.subtitle}</div>` : ''}
-            </div>
-            <div class="link-actions">
-                <button class="btn-card-copy" title="Salin Tautan" data-url="${link.url}">
-                    <i class="fas fa-copy"></i>
-                </button>
-                <div class="link-arrow">
-                    <i class="fas fa-arrow-up-right-from-square"></i>
-                </div>
-            </div>
+        // Konten tengah
+        const content = document.createElement('div');
+        content.className = 'pill-content';
+        content.innerHTML = `
+            <span class="link-pill-title">${link.title}</span>
+            ${link.subtitle ? `<span class="link-pill-subtitle">${link.subtitle}</span>` : ''}
         `;
 
-        // Click on entire card navigates to URL
-        card.addEventListener('click', (e) => {
-            // Check if clicked the copy button
-            const copyBtn = e.target.closest('.btn-card-copy');
-            if (copyBtn) {
-                e.stopPropagation();
-                copyToClipboard(link.url, `Tautan "${link.title}" disalin!`);
-                return;
-            }
+        // Menu titik-tiga di kanan
+        const menu = document.createElement('div');
+        menu.className = 'pill-menu';
 
-            // Track clicks locally
-            link.clicks = (link.clicks || 0) + 1;
+        // Tombol EDIT & HAPUS langsung terlihat (khusus admin)
+        if (isAdmin) {
+            const editBtn = document.createElement('button');
+            editBtn.className = 'pill-action edit';
+            editBtn.title = 'Edit Link';
+            editBtn.innerHTML = `<i class="fas fa-pen"></i>`;
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openLinkEditor(link.id);
+            });
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'pill-action delete';
+            deleteBtn.title = 'Hapus Link';
+            deleteBtn.innerHTML = `<i class="fas fa-trash"></i>`;
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteLink(link.id, link.title);
+            });
+
+            menu.appendChild(editBtn);
+            menu.appendChild(deleteBtn);
+        }
+
+        const dotsBtn = document.createElement('button');
+        dotsBtn.className = 'pill-dots';
+        dotsBtn.title = isAdmin ? 'Menu' : 'Salin Tautan';
+        dotsBtn.innerHTML = `<i class="fas fa-ellipsis"></i>`;
+
+        // Dropdown isi menu
+        const dropdown = document.createElement('div');
+        dropdown.className = 'pill-dropdown';
+
+        let menuHtml = `
+            <button data-action="copy"><i class="fas fa-copy"></i> Salin Tautan</button>
+            <button data-action="open"><i class="fas fa-arrow-up-right-from-square"></i> Buka Link</button>
+        `;
+
+        if (isAdmin) {
+            menuHtml += `
+                <button data-action="edit"><i class="fas fa-pen"></i> Edit</button>
+                <button data-action="delete" class="danger"><i class="fas fa-trash"></i> Hapus</button>
+            `;
+        }
+
+        dropdown.innerHTML = menuHtml;
+
+        // Klik pill (di luar tombol menu) = buka link
+        pill.addEventListener('click', (e) => {
+            if (e.target.closest('.pill-dots') || e.target.closest('.pill-dropdown') || e.target.closest('.pill-action')) return;
             window.open(link.url, '_blank', 'noopener,noreferrer');
         });
 
-        container.appendChild(card);
+        // Toggle dropdown
+        dotsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const wasOpen = dropdown.classList.contains('open');
+            closeAllDropdowns();
+            if (!wasOpen) dropdown.classList.add('open');
+        });
+
+        // Aksi dropdown
+        dropdown.addEventListener('click', (e) => {
+            const actionBtn = e.target.closest('button[data-action]');
+            if (!actionBtn) return;
+            e.stopPropagation();
+
+            const action = actionBtn.getAttribute('data-action');
+            closeAllDropdowns();
+
+            if (action === 'open') {
+                window.open(link.url, '_blank', 'noopener,noreferrer');
+            } else if (action === 'copy') {
+                copyToClipboard(link.url, `Tautan "${link.title}" disalin!`);
+            } else if (action === 'edit') {
+                openLinkEditor(link.id);
+            } else if (action === 'delete') {
+                deleteLink(link.id, link.title);
+            }
+        });
+
+        menu.appendChild(dotsBtn);
+        menu.appendChild(dropdown);
+        pill.appendChild(content);
+        pill.appendChild(menu);
+        container.appendChild(pill);
     });
 }
 
-/**
- * 5. Search Functionality
- */
-function initSearch() {
-    const searchInput = document.getElementById('search-input');
-    const searchClear = document.getElementById('search-clear');
-    if (!searchInput) return;
+function closeAllDropdowns() {
+    document.querySelectorAll('.pill-dropdown.open').forEach(d => d.classList.remove('open'));
+}
 
-    searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value.trim();
-        if (searchClear) {
-            searchClear.style.display = searchQuery ? 'block' : 'none';
-        }
-        renderLinks();
+// Tutup dropdown saat klik di luar
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.pill-menu')) {
+        closeAllDropdowns();
+    }
+});
+
+/**
+ * 4. Link Editor — Add / Edit / Delete (Admin)
+ */
+function initLinkEditor() {
+    const form = document.getElementById('link-editor-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveLinkFromForm();
     });
 
-    if (searchClear) {
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            searchQuery = '';
-            searchClear.style.display = 'none';
-            searchInput.focus();
-            renderLinks();
-        });
+    const cancelBtn = document.getElementById('btn-cancel-link');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => closeModal('modal-link-editor'));
     }
 }
 
-/**
- * 6. Theme Switcher System
- */
-function initThemes() {
-    const savedTheme = localStorage.getItem('microsite_theme') || 'midnight';
-    setTheme(savedTheme);
+function openLinkEditor(linkId = null) {
+    const modal = document.getElementById('modal-link-editor');
+    const form = document.getElementById('link-editor-form');
+    if (!modal || !form) return;
 
-    const themeGrid = document.getElementById('theme-grid');
-    if (!themeGrid || !siteData.themes) return;
+    form.reset();
 
-    themeGrid.innerHTML = '';
-    siteData.themes.forEach(theme => {
-        const card = document.createElement('div');
-        card.className = `theme-card ${theme.id === savedTheme ? 'active' : ''}`;
-        card.setAttribute('data-theme-id', theme.id);
-        
-        card.innerHTML = `
-            <div class="theme-preview-circle" style="background: ${theme.primary}; color: #fff;">
-                ${theme.icon}
-            </div>
-            <span class="theme-name">${theme.name}</span>
-        `;
+    const titleEl = document.getElementById('link-editor-title');
+    const idEl = document.getElementById('link-id');
 
-        card.addEventListener('click', () => {
-            setTheme(theme.id);
-            document.querySelectorAll('.theme-card').forEach(tc => tc.classList.remove('active'));
-            card.classList.add('active');
-            showToast(`Tema diubah ke ${theme.name}`);
-            closeAllModals();
-        });
+    if (linkId !== null) {
+        const link = siteData.links.find(l => String(l.id) === String(linkId));
+        if (!link) return;
 
-        themeGrid.appendChild(card);
-    });
-
-    // Theme toggle button on top bar opens theme modal
-    const themeBtn = document.getElementById('btn-theme');
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => openModal('modal-themes'));
+        titleEl.innerHTML = `<i class="fas fa-pen"></i> Edit Link`;
+        idEl.value = link.id;
+        document.getElementById('link-title').value = link.title || '';
+        document.getElementById('link-url').value = link.url || '';
+        document.getElementById('link-subtitle').value = link.subtitle || '';
+        document.getElementById('link-highlighted').checked = !!link.highlighted;
+    } else {
+        titleEl.innerHTML = `<i class="fas fa-plus"></i> Tambah Link`;
+        idEl.value = '';
     }
+
+    openModal('modal-link-editor');
 }
 
-function setTheme(themeId) {
-    document.documentElement.setAttribute('data-theme', themeId);
-    localStorage.setItem('microsite_theme', themeId);
-}
+function saveLinkFromForm() {
+    const idVal = document.getElementById('link-id').value;
+    const data = {
+        title: document.getElementById('link-title').value.trim(),
+        url: document.getElementById('link-url').value.trim(),
+        subtitle: document.getElementById('link-subtitle').value.trim(),
+        highlighted: document.getElementById('link-highlighted').checked
+    };
 
-/**
- * 7. Mini Music Player Widget
- */
-function initMusicPlayer() {
-    const widget = document.getElementById('music-widget');
-    const audio = document.getElementById('bg-audio');
-    const toggleBtn = document.getElementById('music-toggle-btn');
-    const playIcon = document.getElementById('music-play-icon');
-    const topSoundBtn = document.getElementById('btn-sound');
-    
-    if (!siteData.musicPlayer || !siteData.musicPlayer.enabled) {
-        if (widget) widget.style.display = 'none';
-        if (topSoundBtn) topSoundBtn.style.display = 'none';
+    if (!data.title || !data.url) {
+        showToast('Judul dan URL wajib diisi.');
         return;
     }
 
-    const { musicPlayer } = siteData;
-    document.getElementById('music-cover').src = musicPlayer.cover;
-    document.getElementById('music-track').textContent = musicPlayer.title;
-    document.getElementById('music-artist').textContent = musicPlayer.artist;
-    audio.src = musicPlayer.audioSrc;
-
-    let isPlaying = false;
-
-    function togglePlayback() {
-        if (isPlaying) {
-            audio.pause();
-            widget.classList.remove('music-playing');
-            playIcon.className = 'fas fa-play';
-            if (topSoundBtn) topSoundBtn.style.color = '';
-            isPlaying = false;
-        } else {
-            audio.play().then(() => {
-                widget.classList.add('music-playing');
-                playIcon.className = 'fas fa-pause';
-                if (topSoundBtn) topSoundBtn.style.color = 'var(--primary)';
-                isPlaying = true;
-                showToast(`Memutar: ${musicPlayer.title}`);
-            }).catch(() => {
-                showToast("Klik tombol untuk memutar audio");
-            });
+    if (idVal) {
+        // EDIT
+        const index = siteData.links.findIndex(l => String(l.id) === String(idVal));
+        if (index !== -1) {
+            data.id = siteData.links[index].id;
+            data.clicks = siteData.links[index].clicks || 0;
+            siteData.links[index] = data;
         }
+        showToast(`Link "${data.title}" diperbarui!`);
+    } else {
+        // ADD
+        data.id = Date.now();
+        data.clicks = 0;
+        siteData.links.push(data);
+        showToast(`Link "${data.title}" ditambahkan!`);
     }
 
-    if (toggleBtn) toggleBtn.addEventListener('click', togglePlayback);
-    if (topSoundBtn) topSoundBtn.addEventListener('click', togglePlayback);
-    
-    audio.addEventListener('ended', () => {
-        isPlaying = false;
-        widget.classList.remove('music-playing');
-        playIcon.className = 'fas fa-play';
-        if (topSoundBtn) topSoundBtn.style.color = '';
-    });
+    persistLinks();
+    renderLinks();
+    closeModal('modal-link-editor');
+}
+
+function deleteLink(linkId, linkTitle) {
+    if (!confirm(`Hapus link "${linkTitle}"?\n\nTindakan ini tidak bisa dibatalkan.`)) return;
+
+    siteData.links = siteData.links.filter(l => String(l.id) !== String(linkId));
+    persistLinks();
+    renderLinks();
+    showToast(`Link "${linkTitle}" dihapus.`);
 }
 
 /**
- * 8. Share Features & QR Code Generation
- */
-function initShareFeatures() {
-    const currentUrl = window.location.href;
-    const shareInput = document.getElementById('share-link-input');
-    if (shareInput) shareInput.value = currentUrl;
-
-    // Generate Dynamic QR Code using QR Server API
-    const qrBox = document.getElementById('qr-code-box');
-    if (qrBox) {
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentUrl)}&margin=1`;
-        qrBox.innerHTML = `<img src="${qrUrl}" alt="QR Code Profil" width="160" height="160">`;
-    }
-
-    // Copy share link button
-    const copyShareBtn = document.getElementById('btn-copy-share-link');
-    if (copyShareBtn) {
-        copyShareBtn.addEventListener('click', () => {
-            copyToClipboard(currentUrl, 'Tautan profil berhasil disalin!');
-        });
-    }
-
-    // Top & Footer share buttons
-    const btnShare = document.getElementById('btn-share');
-    if (btnShare) btnShare.addEventListener('click', () => openModal('modal-share'));
-
-    const footerCopyUrl = document.getElementById('footer-copy-url');
-    if (footerCopyUrl) {
-        footerCopyUrl.addEventListener('click', () => {
-            copyToClipboard(currentUrl, 'URL microsite berhasil disalin ke clipboard!');
-        });
-    }
-
-    const footerQrCode = document.getElementById('footer-qr-code');
-    if (footerQrCode) {
-        footerQrCode.addEventListener('click', () => openModal('modal-share'));
-    }
-
-    // Social share buttons inside modal
-    const shareWa = document.getElementById('share-wa');
-    if (shareWa) {
-        shareWa.addEventListener('click', () => {
-            const text = `Halo! Kunjungi bio link resmi ${siteData.profile.name} di: ${currentUrl}`;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-        });
-    }
-
-    const shareTg = document.getElementById('share-tg');
-    if (shareTg) {
-        shareTg.addEventListener('click', () => {
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(siteData.profile.name + ' - Official Links')}`, '_blank');
-        });
-    }
-
-    const shareTw = document.getElementById('share-tw');
-    if (shareTw) {
-        shareTw.addEventListener('click', () => {
-            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out ' + siteData.profile.name + ' links: ')}&url=${encodeURIComponent(currentUrl)}`, '_blank');
-        });
-    }
-
-    const shareNative = document.getElementById('share-native');
-    if (shareNative) {
-        shareNative.addEventListener('click', () => {
-            if (navigator.share) {
-                navigator.share({
-                    title: `${siteData.profile.name} - Bio Links`,
-                    text: siteData.profile.bio,
-                    url: currentUrl
-                }).catch(() => {});
-            } else {
-                copyToClipboard(currentUrl, 'Tautan disalin ke clipboard!');
-            }
-        });
-    }
-}
-
-/**
- * 9. Contact Modal & Form Handling
- */
-function initContactForm() {
-    const btnOpenContact = document.getElementById('btn-open-contact');
-    if (btnOpenContact) {
-        btnOpenContact.addEventListener('click', () => openModal('modal-contact'));
-    }
-
-    const contactForm = document.getElementById('quick-contact-form');
-    const sendWaBtn = document.getElementById('btn-send-wa');
-
-    // WhatsApp Send
-    if (sendWaBtn) {
-        sendWaBtn.addEventListener('click', () => {
-            const name = document.getElementById('contact-name').value.trim();
-            const topic = document.getElementById('contact-topic').value;
-            const message = document.getElementById('contact-message').value.trim();
-
-            if (!name || !message) {
-                showToast('Mohon isi nama dan pesan Anda terlebih dahulu.');
-                return;
-            }
-
-            const text = `Halo ${siteData.profile.name},\nSaya *${name}* ingin berdiskusi mengenai: *${topic}*.\n\n*Pesan:*\n${message}`;
-            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
-            closeAllModals();
-            showToast('Membuka WhatsApp...');
-        });
-    }
-
-    // Email Send
-    if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('contact-name').value.trim();
-            const topic = document.getElementById('contact-topic').value;
-            const message = document.getElementById('contact-message').value.trim();
-
-            const mailto = `mailto:hello@vincentlie.dev?subject=${encodeURIComponent('[' + topic + '] Pesan dari ' + name)}&body=${encodeURIComponent(message + '\n\n---\nPengirim: ' + name)}`;
-            window.location.href = mailto;
-            closeAllModals();
-            showToast('Membuka aplikasi Email...');
-        });
-    }
-}
-
-/**
- * 10. Generic Modal Management
+ * 5. Modal
  */
 function initModals() {
-    // Close button triggers
     document.querySelectorAll('[data-close]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const modalId = btn.getAttribute('data-close');
-            closeModal(modalId);
-        });
+        btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close')));
     });
 
-    // Close on backdrop click
     document.querySelectorAll('.modal-backdrop').forEach(modal => {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal(modal.id);
-            }
+            if (e.target === modal) closeModal(modal.id);
         });
     });
 
-    // Close on Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeAllModals();
+            closeAllDropdowns();
         }
     });
 }
@@ -512,42 +381,36 @@ function closeModal(modalId) {
 }
 
 function closeAllModals() {
-    document.querySelectorAll('.modal-backdrop').forEach(modal => {
-        modal.classList.remove('active');
-    });
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
     document.body.style.overflow = '';
 }
 
 /**
- * 11. Clipboard Utility & Toast System
+ * 6. Clipboard & Toast
  */
-function copyToClipboard(text, successMessage = 'Disalin ke clipboard!') {
+function copyToClipboard(text, successMessage = 'Disalin!') {
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast(successMessage);
-        }).catch(() => {
-            fallbackCopy(text, successMessage);
-        });
+        navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(() => fallbackCopy(text, successMessage));
     } else {
         fallbackCopy(text, successMessage);
     }
 }
 
 function fallbackCopy(text, successMessage) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-999999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
     try {
         document.execCommand('copy');
         showToast(successMessage);
     } catch (err) {
-        showToast('Gagal menyalin tautan');
+        showToast('Gagal menyalin');
     }
-    document.body.removeChild(textArea);
+    document.body.removeChild(ta);
 }
 
 function showToast(message) {
@@ -557,12 +420,9 @@ function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = `<i class="fas fa-check-circle"></i> <span>${message}</span>`;
-
     container.appendChild(toast);
 
     setTimeout(() => {
-        if (toast.parentElement) {
-            toast.remove();
-        }
+        if (toast.parentElement) toast.remove();
     }, 3000);
 }

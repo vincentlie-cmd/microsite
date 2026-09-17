@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0%" stop-color="#fdf3f7"/>
+      <stop offset="100%" stop-color="#f3d9e5"/>
+    </radialGradient>
+    <linearGradient id="petal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd7e8"/>
+      <stop offset="100%" stop-color="#f7a8c4"/>
+    </linearGradient>
+    <linearGradient id="petal2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffc3da"/>
+      <stop offset="100%" stop-color="#ef8fb4"/>
+    </linearGradient>
+    <radialGradient id="center" cx="40%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#ffe38f"/>
+      <stop offset="100%" stop-color="#e8a53d"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#bg)"/>
+
+  <!-- Daun -->
+  <ellipse cx="118" cy="318" rx="64" ry="26" fill="#9fc6ad" transform="rotate(-32 118 318)"/>
+  <ellipse cx="284" cy="320" rx="58" ry="24" fill="#b5d6bf" transform="rotate(28 284 320)"/>
+
+  <!-- Kelopak bunga: 8 kelopak melingkar -->
+  <g>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal)" transform="rotate(0 200 200)"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal2)" transform="rotate(45 200 200)" opacity="0.92"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal)" transform="rotate(90 200 200)"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal2)" transform="rotate(135 200 200)" opacity="0.92"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal)" transform="rotate(180 200 200)"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal2)" transform="rotate(225 200 200)" opacity="0.92"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal)" transform="rotate(270 200 200)"/>
+    <ellipse cx="200" cy="103" rx="38" ry="72" fill="url(#petal2)" transform="rotate(315 200 200)" opacity="0.92"/>
+  </g>
+
+  <!-- Putik tengah -->
+  <circle cx="200" cy="200" r="42" fill="url(#center)"/>
+  <circle cx="200" cy="200" r="42" fill="none" stroke="#d18f2f" stroke-width="3" opacity="0.5"/>
+  <circle cx="186" cy="186" r="10" fill="#fff3c9" opacity="0.85"/>
+
+  <!-- Titik-titik kecil hiasan -->
+  <circle cx="86" cy="96" r="6" fill="#f2b8cd" opacity="0.8"/>
+  <circle cx="322" cy="120" r="8" fill="#f2b8cd" opacity="0.7"/>
+  <circle cx="308" cy="72" r="4" fill="#e79ebd" opacity="0.7"/>
+  <circle cx="70" cy="180" r="5" fill="#e79ebd" opacity="0.6"/>
+</svg>

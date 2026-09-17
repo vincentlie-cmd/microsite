@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk | Vincent Lie Links</title>
+    <meta name="description" content="Halaman login admin untuk mengelola link microsite.">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+    <main class="auth-wrapper">
+        <div class="auth-card">
+
+            <div class="auth-logo">🔐</div>
+            <h1 class="auth-title">Vincent Lie</h1>
+            <p class="auth-sub">Masuk untuk mengelola link di microsite Anda</p>
+
+            <!-- Tab Switcher -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" data-tab="login">Masuk</button>
+                <button type="button" class="auth-tab" data-tab="register">Daftar</button>
+            </div>
+
+            <!-- Form Login -->
+            <form id="login-form" class="auth-form active" novalidate>
+                <div class="auth-error"></div>
+
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" placeholder="Masukkan username" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-field">
+                        <input type="password" id="login-password" placeholder="Masukkan password" autocomplete="current-password" required>
+                        <button type="button" class="toggle-pass" data-target="login-password" aria-label="Tampilkan password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-solid">
+                    <span>Masuk</span> <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Form Register -->
+            <form id="register-form" class="auth-form" novalidate>
+                <div class="auth-error"></div>
+
+                <div class="form-group">
+                    <label for="register-name">Nama Lengkap</label>
+                    <input type="text" id="register-name" placeholder="Misal: Budi Santoso" autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" id="register-username" placeholder="Minimal 3 karakter" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <div class="password-field">
+                        <input type="password" id="register-password" placeholder="Minimal 6 karakter" autocomplete="new-password" required>
+                        <button type="button" class="toggle-pass" data-target="register-password" aria-label="Tampilkan password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-confirm">Konfirmasi Password</label>
+                    <div class="password-field">
+                        <input type="password" id="register-confirm" placeholder="Ulangi password" autocomplete="new-password" required>
+                        <button type="button" class="toggle-pass" data-target="register-confirm" aria-label="Tampilkan password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-solid">
+                    <span>Daftar Sekarang</span> <i class="fas fa-user-plus"></i>
+                </button>
+            </form>
+
+            <a href="index.html" class="auth-back-link">
+                <i class="fas fa-arrow-left"></i> Kembali ke halaman profil
+            </a>
+
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+</body>
+</html>

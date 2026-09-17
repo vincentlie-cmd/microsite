@@ -1,284 +1,101 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="midnight">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vincent Lie | Bio & Official Links</title>
-    <meta name="description" content="Koleksi tautan resmi, portofolio, produk, dan media sosial Vincent Lie. Temukan semua informasi penting di satu tempat.">
-    
-    <!-- Open Graph / Meta Sosial -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Vincent Lie - Bio Links">
-    <meta property="og:description" content="Temukan semua portofolio, produk, dan media sosial Vincent Lie.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80">
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
-    
+    <meta name="description" content="Koleksi tautan resmi, portofolio, produk, dan media sosial Vincent Lie.">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Dynamic Animated Background Canvas & Glow Orbs -->
-    <div class="bg-glow-container" aria-hidden="true">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-        <div class="glow-orb orb-3"></div>
-        <div class="bg-noise"></div>
-    </div>
+    <main class="page-wrapper">
+        <div class="profile-card">
 
-    <!-- Main Container -->
-    <main class="microsite-wrapper">
-        <div class="microsite-card">
-            
-            <!-- Top Action Bar -->
-            <header class="top-nav">
-                <button class="nav-btn" id="btn-theme" title="Ubah Tema" aria-label="Ganti Tema">
-                    <i class="fas fa-palette"></i>
-                    <span class="nav-btn-text">Tema</span>
+            <!-- Tombol menu kanan atas (login / logout / admin) -->
+            <button class="menu-btn" id="btn-auth" title="Masuk Admin" aria-label="Menu Admin">
+                <i class="fas fa-ellipsis" id="btn-auth-icon"></i>
+            </button>
+
+            <!-- Avatar -->
+            <div class="avatar-wrapper">
+                <img src="" alt="Foto Profil" id="profile-avatar" class="avatar-img">
+            </div>
+
+            <!-- Nama & Bio -->
+            <h1 class="profile-handle" id="profile-handle">@vincentlie</h1>
+            <p class="profile-bio" id="profile-bio">Loading bio...</p>
+
+            <!-- Menu Actions Admin (hanya tampil setelah login) -->
+            <div class="admin-bar" id="admin-bar" style="display: none;">
+                <button class="admin-chip" id="btn-add-link">
+                    <i class="fas fa-plus"></i> Tambah Link
                 </button>
-                <div class="nav-actions-right">
-                    <button class="nav-btn icon-only" id="btn-sound" title="Musik / Ambient" aria-label="Toggle Suara">
-                        <i class="fas fa-music"></i>
-                    </button>
-                    <button class="nav-btn share-btn" id="btn-share" title="Bagikan Profil" aria-label="Bagikan Halaman">
-                        <i class="fas fa-share-nodes"></i>
-                        <span>Bagikan</span>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Profile Section -->
-            <section class="profile-section">
-                <div class="avatar-wrapper">
-                    <div class="avatar-glow"></div>
-                    <img src="" alt="Foto Profil" id="profile-avatar" class="avatar-img" loading="eager">
-                    <div class="online-indicator" title="Online & Aktif" id="online-status"></div>
-                </div>
-
-                <div class="profile-info">
-                    <div class="name-container">
-                        <h1 id="profile-name">Vincent Lie</h1>
-                        <span class="verified-badge" id="verified-badge" title="Terverifikasi">
-                            <i class="fas fa-circle-check"></i>
-                        </span>
-                    </div>
-                    <p class="profile-handle" id="profile-handle">@vincentlie</p>
-
-                    <div class="status-pill" id="status-pill">
-                        <span class="pulse-dot"></span>
-                        <span id="status-text">Open for Collaborations 🚀</span>
-                    </div>
-
-                    <p class="profile-bio" id="profile-bio">
-                        Loading bio...
-                    </p>
-
-                    <div class="profile-meta">
-                        <span class="meta-item location">
-                            <i class="fas fa-location-dot"></i> <span id="profile-location">Jakarta, Indonesia</span>
-                        </span>
-                    </div>
-
-                    <!-- Profile Stats -->
-                    <div class="profile-stats">
-                        <div class="stat-box">
-                            <span class="stat-value" id="stat-views">12.4K</span>
-                            <span class="stat-label">Pengunjung</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-box">
-                            <span class="stat-value" id="stat-links">7</span>
-                            <span class="stat-label">Tautan</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-box">
-                            <span class="stat-value" id="stat-followers">8.5K</span>
-                            <span class="stat-label">Komunitas</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Social Icons Bar -->
-                <div class="social-bar" id="social-bar">
-                    <!-- Dynamic Social Icons -->
-                </div>
-            </section>
-
-            <!-- Mini Music Player Widget -->
-            <section class="music-widget" id="music-widget">
-                <div class="music-cover-wrapper">
-                    <img src="" alt="Album Cover" id="music-cover" class="music-cover">
-                    <div class="music-disc-glow"></div>
-                </div>
-                <div class="music-info">
-                    <div class="music-track-name" id="music-track">Midnight City Groove</div>
-                    <div class="music-artist-name" id="music-artist">Vincent's Playlist</div>
-                </div>
-                <div class="music-controls">
-                    <div class="visualizer-bars" id="music-visualizer">
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                    </div>
-                    <button class="music-play-btn" id="music-toggle-btn" aria-label="Putar Musik">
-                        <i class="fas fa-play" id="music-play-icon"></i>
-                    </button>
-                </div>
-                <audio id="bg-audio" preload="none"></audio>
-            </section>
-
-            <!-- Search & Category Filters -->
-            <section class="filter-section">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-input" placeholder="Cari tautan atau topik..." autocomplete="off">
-                    <button class="search-clear-btn" id="search-clear" style="display: none;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="category-chips" id="category-chips">
-                    <!-- Dynamic Category Chips -->
-                </div>
-            </section>
-
-            <!-- Links Section -->
-            <section class="links-section" id="links-container">
-                <!-- Dynamic Links Cards will be generated here -->
-            </section>
-
-            <!-- Quick Action / Message Card -->
-            <section class="contact-cta-card">
-                <div class="cta-content">
-                    <div class="cta-icon-box">
-                        <i class="fas fa-paper-plane"></i>
-                    </div>
-                    <div class="cta-text">
-                        <h3>Ada Proyek atau Kolaborasi?</h3>
-                        <p>Kirim pesan langsung atau ajukan penawaran kerja sama.</p>
-                    </div>
-                </div>
-                <button class="btn-primary" id="btn-open-contact">
-                    <span>Hubungi Sekarang</span>
-                    <i class="fas fa-arrow-right"></i>
+                <button class="admin-chip logout" id="btn-logout">
+                    <i class="fas fa-right-from-bracket"></i> Keluar
                 </button>
-            </section>
+            </div>
 
-            <!-- Footer -->
-            <footer class="microsite-footer">
-                <div class="footer-links">
-                    <button id="footer-copy-url"><i class="fas fa-link"></i> Salin URL Halaman</button>
-                    <span>•</span>
-                    <button id="footer-qr-code"><i class="fas fa-qrcode"></i> Lihat QR Code</button>
-                </div>
-                <p class="copyright">
-                    Dibuat dengan ❤️ oleh <span id="footer-name">Vincent Lie</span> &copy; <span id="current-year">2026</span>
-                </p>
-                <div class="brand-pill">
-                    <i class="fas fa-bolt"></i> Powered by <strong>Modern Microsite</strong>
-                </div>
+            <!-- Daftar Link -->
+            <nav class="links-list" id="links-container">
+                <!-- Link cards di-generate oleh app.js -->
+            </nav>
+
+            <!-- Footer kecil -->
+            <footer class="page-footer">
+                <p>Dibuat dengan <span class="heart">❤</span> · <span id="current-year">2026</span></p>
             </footer>
 
         </div>
     </main>
 
-    <!-- Modal: Share Profile & QR Code -->
-    <div class="modal-backdrop" id="modal-share">
+    <!-- Modal: Editor Link (Add / Edit) -->
+    <div class="modal-backdrop" id="modal-link-editor">
         <div class="modal-dialog">
             <div class="modal-header">
-                <h3><i class="fas fa-share-nodes"></i> Bagikan Microsite</h3>
-                <button class="modal-close" data-close="modal-share"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="qr-container">
-                    <div class="qr-code-box" id="qr-code-box">
-                        <!-- Dynamic QR Code SVG/Image -->
-                    </div>
-                    <p class="qr-hint">Scan QR code ini untuk membuka profil langsung di smartphone</p>
-                </div>
-
-                <div class="share-copy-box">
-                    <input type="text" id="share-link-input" readonly value="">
-                    <button id="btn-copy-share-link" class="btn-copy">
-                        <i class="fas fa-copy"></i> Salin
-                    </button>
-                </div>
-
-                <div class="share-social-grid">
-                    <button class="share-social-btn whatsapp" id="share-wa">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
-                    <button class="share-social-btn telegram" id="share-tg">
-                        <i class="fab fa-telegram"></i> Telegram
-                    </button>
-                    <button class="share-social-btn twitter" id="share-tw">
-                        <i class="fab fa-x-twitter"></i> Twitter / X
-                    </button>
-                    <button class="share-social-btn native" id="share-native">
-                        <i class="fas fa-ellipsis"></i> Lainnya
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Theme Selector -->
-    <div class="modal-backdrop" id="modal-themes">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h3><i class="fas fa-palette"></i> Pilih Tema Tampilan</h3>
-                <button class="modal-close" data-close="modal-themes"><i class="fas fa-times"></i></button>
+                <h3 id="link-editor-title"><i class="fas fa-plus"></i> Tambah Link</h3>
+                <button class="modal-close" data-close="modal-link-editor"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <p class="modal-desc">Sesuaikan nuansa warna sesuai preferensi visual Anda:</p>
-                <div class="theme-grid" id="theme-grid">
-                    <!-- Dynamic Theme Options -->
-                </div>
-            </div>
-        </div>
-    </div>
+                <form id="link-editor-form">
+                    <input type="hidden" id="link-id" value="">
 
-    <!-- Modal: Direct Message / Contact -->
-    <div class="modal-backdrop" id="modal-contact">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h3><i class="fas fa-envelope-open-text"></i> Kirim Pesan Cepat</h3>
-                <button class="modal-close" data-close="modal-contact"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <form id="quick-contact-form">
                     <div class="form-group">
-                        <label for="contact-name">Nama Lengkap</label>
-                        <input type="text" id="contact-name" placeholder="Misal: Budi Santoso" required>
+                        <label for="link-title">Judul Link *</label>
+                        <input type="text" id="link-title" placeholder="Misal: Product Recommendations" required>
                     </div>
+
                     <div class="form-group">
-                        <label for="contact-topic">Kebutuhan / Subjek</label>
-                        <select id="contact-topic">
-                            <option value="Proyek Web Development">Proyek Web Development</option>
-                            <option value="Konsultasi & Mentoring">Konsultasi & Mentoring</option>
-                            <option value="Kerjasama Bisnis & Sponsorship">Kerjasama Bisnis & Sponsorship</option>
-                            <option value="Tanya-tanya Lainnya">Tanya-tanya Lainnya</option>
-                        </select>
+                        <label for="link-url">URL *</label>
+                        <input type="url" id="link-url" placeholder="https://contoh.com" required>
                     </div>
+
                     <div class="form-group">
-                        <label for="contact-message">Pesan Anda</label>
-                        <textarea id="contact-message" rows="3" placeholder="Tuliskan detail pesan atau pertanyaan Anda di sini..." required></textarea>
+                        <label for="link-subtitle">Deskripsi Singkat</label>
+                        <input type="text" id="link-subtitle" placeholder="Opsional">
                     </div>
-                    <div class="contact-actions">
-                        <button type="button" class="btn-whatsapp-send" id="btn-send-wa">
-                            <i class="fab fa-whatsapp"></i> Kirim via WhatsApp
-                        </button>
-                        <button type="submit" class="btn-email-send">
-                            <i class="fas fa-paper-plane"></i> Kirim via Email
+
+                    <label class="checkbox-inline" for="link-highlighted">
+                        <input type="checkbox" id="link-highlighted">
+                        <span>Tandai sebagai link unggulan</span>
+                    </label>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-ghost" id="btn-cancel-link">Batal</button>
+                        <button type="submit" class="btn-solid">
+                            <i class="fas fa-save"></i> Simpan
                         </button>
                     </div>
                 </form>
@@ -291,6 +108,7 @@
 
     <!-- Scripts -->
     <script src="data.js"></script>
+    <script src="auth.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
